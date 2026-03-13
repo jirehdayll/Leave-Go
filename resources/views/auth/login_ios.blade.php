@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Leave Go - Sign In</title>
+    <title>Gordon College - Leave Management System</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('notifications.flash')
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a5f3f 0%, #2d8659 50%, #1a5f3f 100%);
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
@@ -33,13 +33,13 @@
         
         .ios-input:focus {
             outline: none;
-            border-color: #007AFF;
-            background: rgba(0, 122, 255, 0.05);
-            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+            border-color: #1a5f3f;
+            background: rgba(26, 95, 63, 0.05);
+            box-shadow: 0 0 0 4px rgba(26, 95, 63, 0.1);
         }
         
         .ios-button {
-            background: #007AFF;
+            background: #1a5f3f;
             color: white;
             border: none;
             border-radius: 12px;
@@ -52,9 +52,9 @@
         }
         
         .ios-button:hover {
-            background: #0056CC;
+            background: #2d8659;
             transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(26, 95, 63, 0.3);
         }
         
         .ios-button:active {
@@ -80,16 +80,37 @@
         .logo {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #007AFF, #0051D5);
-            border-radius: 20px;
+            background: linear-gradient(135deg, #1a5f3f, #2d8659);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 32px;
+            font-size: 24px;
             font-weight: bold;
             margin: 0 auto 30px;
-            box-shadow: 0 10px 30px rgba(0, 122, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(26, 95, 63, 0.3);
+            position: relative;
+        }
+        
+        .logo::before {
+            content: '';
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            top: -5px;
+            left: -5px;
+        }
+        
+        .logo-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a5f3f;
+            text-align: center;
+            margin-top: 10px;
+            letter-spacing: 1px;
         }
         
         .form-label {
@@ -125,11 +146,13 @@
     <div class="min-h-screen flex items-center justify-center px-4 py-12">
         <div class="ios-card p-8 w-full max-w-md animate-slide-up">
             <div class="logo">
-                LG
+                GC
             </div>
+            <div class="logo-text">GORDON COLLEGE</div>
+            <div class="logo-text" style="font-size: 12px; margin-top: -5px;">OLONGAPO CITY</div>
             
-            <h1 class="text-3xl font-bold text-center mb-2" style="color: #1D1D1F;">Welcome Back</h1>
-            <p class="text-center mb-8" style="color: #8E8E93;">Sign in to your Leave Go account</p>
+            <h1 class="text-3xl font-bold text-center mb-2" style="color: #1D1D1F;">Welcome to Gordon College</h1>
+            <p class="text-center mb-8" style="color: #8E8E93;">Sign in to your Leave Management account</p>
             
             @if ($errors->any())
                 <div class="error-message">
@@ -137,7 +160,7 @@
                 </div>
             @endif
             
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="/login">
                 @csrf
                 
                 <div class="input-group">
@@ -174,7 +197,7 @@
                 </div>
                 
                 <button type="submit" class="ios-button mb-4">
-                    Sign In
+                    Sign In to Gordon College
                 </button>
                 
                 @if (Route::has('password.request'))
