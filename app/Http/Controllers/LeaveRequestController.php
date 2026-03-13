@@ -18,6 +18,11 @@ class LeaveRequestController extends Controller
             'salary' => 'required|string',
         ]);
 
+        // Capture all other inputs not explicitly validated (checkboxes, specific types, etc.)
+        $extraData = $request->except(['_token', 'type', 'office', 'name', 'date_filling', 'position', 'salary']);
+        
+        $validated['details'] = $extraData;
+
         LeaveRequest::create($validated);
 
         return redirect()->route('forms.success');

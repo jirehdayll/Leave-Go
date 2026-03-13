@@ -14,5 +14,13 @@ class LeaveRequest extends Model
         'position',
         'salary',
         'status',
+        'is_starred',
+        'details',
+    ];
+
+    protected $casts = [
+        'details' => 'array',
+        'date_filling' => 'date',
+        'is_starred' => 'boolean',
     ];
 }
