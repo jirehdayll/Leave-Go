@@ -12,30 +12,8 @@ Route::get('/', function () {
     return view('auth.login_ios');
 })->name('login');
 
-Route::post('/login', function (Request $request) {
-    $credentials = $request->validate([
-        'email'    => ['required', 'email'],
-        'password' => ['required'],
-    ]);
-
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        // Admin goes directly to dashboard
-        if (Auth::user()->is_admin) {
-            return redirect()->route('admin.dashboard');
-        }
-        return redirect()->route('selection');
-    }
-
-    return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
-})->name('login.post');
-
-Route::post('/logout', function (Request $request) {
-    Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-    return redirect()->route('login');
-})->name('logout');
+// Use Laravel UI auth routes
+Auth::routes();
 
 // ─── User Pages ──────────────────────────────────────────────────────────
 Route::get('/selection', function () {

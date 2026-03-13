@@ -41,47 +41,17 @@ class LoginController extends Controller
     }
 
     /**
-     * Validate the user login request.
+     * Where to redirect users after login.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return void
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function validateLogin(Request $request)
-    {
-        $request->validate([
-            $this->username() => 'required|string|email',
-            'password' => 'required|string',
-        ], [
-            'email.required' => 'Email address is required.',
-            'email.email' => 'Please enter a valid email address.',
-            'password.required' => 'Password is required.',
-        ]);
-    }
-
-    /**
-     * Get the failed login response instance.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function sendFailedLoginResponse(Request $request)
-    {
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
-        ]);
-    }
-
-    /**
-     * Get the login username to be used by the controller.
-     *
+     * @param  \App\Models\User  $user
      * @return string
      */
-    public function username()
+    protected function authenticated(Request $request, $user)
     {
-        return 'email';
+        if ($user->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('selection');
     }
 }
