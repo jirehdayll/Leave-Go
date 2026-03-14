@@ -9,11 +9,11 @@ use App\Models\LeaveRequest;
 
 // ─── Auth ───────────────────────────────────────────────────────────────
 Route::get('/', function () {
-    return view('auth.login_ios');
-})->name('login');
+    return view('auth.login');
+})->name('login.page');
 
-// Use Laravel UI auth routes
-Auth::routes();
+// Use Laravel UI auth routes without login/register
+Auth::routes(['login' => true, 'register' => false, 'reset' => true]);
 
 // ─── User Pages ──────────────────────────────────────────────────────────
 Route::get('/selection', function () {
