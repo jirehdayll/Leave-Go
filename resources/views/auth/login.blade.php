@@ -6,6 +6,15 @@
     <title>Leave&Go - Login</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        :root {
+            --primary-green: #2ecc71;
+            --hover-green: #27ae60;
+            --accent-blue: #007bff;
+            --text-dark: #002d24;
+            --input-bg: #f5f5f7;
+            --bg-pinkish: #fcf8fb;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,277 +22,275 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            background-color: var(--bg-pinkish);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            position: relative;
         }
-        
-        .background-decoration {
+
+        /* Background Decorations */
+        .decorations {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            overflow: hidden;
+            z-index: 0;
         }
-        
-        .blue-semicircle {
+
+        .blue-arc {
             position: absolute;
-            top: -100px;
-            left: -100px;
-            width: 300px;
-            height: 300px;
-            background: rgba(52, 152, 219, 0.3);
-            border-radius: 50%;
-        }
-        
-        .green-stripes {
-            position: absolute;
-            top: 50px;
-            left: 50px;
-            width: 200px;
-            height: 100px;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(46, 204, 113, 0.3),
-                rgba(46, 204, 113, 0.3) 10px,
-                transparent 10px,
-                transparent 20px
-            );
-        }
-        
-        .white-stripes {
-            position: absolute;
-            top: 100px;
-            left: 100px;
-            width: 150px;
-            height: 150px;
-            background: repeating-linear-gradient(
-                45deg,
-                rgba(255, 255, 255, 0.5),
-                rgba(255, 255, 255, 0.5) 5px,
-                transparent 5px,
-                transparent 10px
-            );
-        }
-        
-        .login-container {
-            background: white;
-            border-radius: 20px;
-            padding: 60px 50px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            position: relative;
+            top: -10%;
+            left: -15%;
+            width: 70%;
+            height: 120%;
+            background-color: #9dbaf0;
+            border-radius: 0 500px 500px 0;
             z-index: 1;
         }
-        
+
+        .stripe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        /* Horizontal/Slanted stripes as seen in the image */
+        .white-stripes {
+            position: absolute;
+            top: 20%;
+            left: -10%;
+            width: 60%;
+            height: 80%;
+            background: repeating-linear-gradient(
+                -25deg,
+                rgba(255, 255, 255, 0.4),
+                rgba(255, 255, 255, 0.4) 30px,
+                transparent 30px,
+                transparent 60px
+            );
+        }
+
+        .green-wave {
+            position: absolute;
+            bottom: -5%;
+            left: -5%;
+            width: 55%;
+            height: 30%;
+            background-color: #a4cc9a;
+            transform: skewY(-15deg);
+            z-index: 3;
+        }
+
+        .green-stripes {
+            position: absolute;
+            bottom: 5%;
+            left: -5%;
+            width: 50%;
+            height: 20%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0.3) 20px,
+                transparent 20px,
+                transparent 40px
+            );
+            z-index: 4;
+        }
+
+        /* Login Layout */
+        .login-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-form-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding-left: 10%;
+        }
+
         .brand {
-            text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 2.5rem;
         }
-        
+
         .brand h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 84px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: var(--text-dark);
+            line-height: 1;
         }
-        
-        .brand .leave {
-            color: #27ae60;
+
+        .brand .ampersat {
+            color: var(--accent-blue);
         }
-        
-        .brand .ampersand {
-            color: #3498db;
+
+        /* Form Styling */
+        .login-box {
+            width: 100%;
+            max-width: 380px;
         }
-        
-        .brand .go {
-            color: #27ae60;
-        }
-        
+
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 1rem;
+            position: relative;
         }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
-            font-size: 14px;
-        }
-        
+
         .form-input {
             width: 100%;
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            background-color: var(--input-bg);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 12px;
             font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #3498db;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-        
-        .form-input::placeholder {
-            color: #999;
-        }
-        
-        .login-button {
-            width: 100%;
-            padding: 15px;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        
-        .login-button:hover {
-            background: #229954;
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
-        }
-        
-        .login-button:active {
-            transform: translateY(0);
-        }
-        
-        .error-message {
-            background: rgba(231, 76, 60, 0.1);
-            border: 1px solid rgba(231, 76, 60, 0.3);
-            color: #e74c3c;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 20px;
+            color: #1d1d1f;
+            transition: all 0.2s ease;
             text-align: center;
         }
-        
-        .field-error {
-            color: #e74c3c;
-            font-size: 12px;
-            margin-top: 5px;
+
+        .form-input:focus {
+            outline: none;
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+            border-color: var(--accent-blue);
         }
-        
-        @media (max-width: 480px) {
-            .login-container {
-                margin: 20px;
-                padding: 40px 30px;
-            }
-            
-            .brand h1 {
-                font-size: 36px;
-            }
+
+        .form-input::placeholder {
+            color: #86868b;
+            font-weight: 500;
         }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+
+        .login-button {
+            width: 100%;
+            padding: 1.15rem;
+            background-color: #44bb22;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 12px rgba(68, 187, 34, 0.2);
         }
-        
-        .login-container {
-            animation: fadeIn 0.6s ease-out;
+
+        .login-button:hover {
+            background-color: #3aa31d;
+            transform: scale(1.01);
+            box-shadow: 0 6px 20px rgba(68, 187, 34, 0.3);
+        }
+
+        .login-button:active {
+            transform: scale(0.98);
+        }
+
+        .error-container {
+            margin-bottom: 1.5rem;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .error-text {
+            color: #ff3b30;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 992px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .login-form-side {
+                padding-left: 0;
+                align-items: center;
+            }
+            .blue-arc, .green-wave, .green-stripes {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="background-decoration">
-        <div class="blue-semicircle"></div>
-        <div class="green-stripes"></div>
+    <div class="decorations">
+        <div class="blue-arc"></div>
         <div class="white-stripes"></div>
+        <div class="green-wave"></div>
+        <div class="green-stripes"></div>
     </div>
     
-    <div class="login-container">
-        <div class="brand">
-            <h1>
-                <span class="leave">Leave</span><span class="ampersand">&</span><span class="go">Go</span>
-            </h1>
-        </div>
+    <div class="login-wrapper">
+        <div class="empty-side"></div> <!-- Placeholder for the left side decoration -->
         
-        @if ($errors->any())
-            <div class="error-message">
-                {{ $errors->first() }}
+        <div class="login-form-side">
+            <div class="brand">
+                <h1>Leave<span class="ampersat">&</span>Go</h1>
             </div>
-        @endif
-        
-        <form method="POST" action="/login">
-            @csrf
             
-            <div class="form-group">
-                <label class="form-label" for="email">Email</label>
-                <input 
-                    type="email" 
-                    id="email"
-                    name="email" 
-                    class="form-input {{ $errors->has('email') ? 'is-invalid' : '' }}" 
-                    value="{{ old('email') }}" 
-                    placeholder="Enter your email"
-                    required 
-                    autocomplete="email" 
-                    autofocus
-                >
-                @if ($errors->has('email'))
-                    <div class="field-error">{{ $errors->first('email') }}</div>
+            <div class="login-box">
+                @if ($errors->any())
+                    <div class="error-container">
+                        <span class="error-text">{{ $errors->first() }}</span>
+                    </div>
                 @endif
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password"
-                    name="password" 
-                    class="form-input {{ $errors->has('password') ? 'is-invalid' : '' }}" 
-                    placeholder="Enter your password"
-                    required 
-                    autocomplete="current-password"
-                >
-                @if ($errors->has('password'))
-                    <div class="field-error">{{ $errors->first('password') }}</div>
-                @endif
-            </div>
-            
-            <button type="submit" class="login-button">
-                LOGIN
-            </button>
-        </form>
-    </div>
-    
-    <script>
-        // Add smooth animations
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = document.querySelectorAll('.form-input');
-            
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.style.transform = 'scale(1.02)';
-                });
                 
-                input.addEventListener('blur', function() {
-                    this.parentElement.style.transform = 'scale(1)';
-                });
-            });
-        });
-    </script>
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    
+                    <div class="form-group">
+                        <input 
+                            type="email" 
+                            name="email" 
+                            class="form-input" 
+                            value="{{ old('email') }}" 
+                            placeholder="Email"
+                            required 
+                            autocomplete="email" 
+                            autofocus
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <input 
+                            type="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="Password"
+                            required 
+                            autocomplete="current-password"
+                        >
+                    </div>
+                    
+                    <button type="submit" class="login-button">
+                        LOGIN
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
+
