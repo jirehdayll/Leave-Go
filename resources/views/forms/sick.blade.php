@@ -1,4 +1,6 @@
 @extends('layouts.app')
+@php $hideNav = true; @endphp
+
 
 @section('title', 'Application for Leave - LeaveGo')
 

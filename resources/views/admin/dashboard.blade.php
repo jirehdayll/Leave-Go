@@ -112,46 +112,7 @@
 <body>
 
 <!-- Sidebar -->
-<aside class="sidebar">
-    <div class="sidebar-header">
-        <div class="sidebar-logo">LeaveGo</div>
-        <div class="sidebar-subtitle">Admin Panel</div>
-    </div>
-    <nav class="sidebar-nav">
-        <div class="nav-section">Applications</div>
-        <a href="{{ route('admin.dashboard', ['tab'=>'pending']) }}" class="nav-item {{ $tab === 'pending' ? 'active' : '' }}">
-            <div class="nav-icon">📥</div>
-            Pending
-            <span class="badge" id="sidebar-badge" style="{{ ($allStats['travel_pending'] + $allStats['leave_pending']) === 0 ? 'display:none' : '' }}">{{ $allStats['travel_pending'] + $allStats['leave_pending'] }}</span>
-        </a>
-        <a href="{{ route('admin.dashboard', ['tab'=>'important']) }}" class="nav-item {{ $tab === 'important' ? 'active' : '' }}">
-            <div class="nav-icon">⭐</div>
-            Important
-        </a>
-        <a href="{{ route('admin.dashboard', ['tab'=>'trash']) }}" class="nav-item {{ $tab === 'trash' ? 'active' : '' }}">
-            <div class="nav-icon">🗑</div>
-            Trash
-        </a>
-        <div class="nav-section" style="margin-top:8px;">Reports</div>
-        <a href="{{ route('admin.monthly') }}" class="nav-item {{ isset($activeNav) && $activeNav === 'monthly' ? 'active' : '' }}">
-            <div class="nav-icon">📊</div>
-            Monthly Summary
-        </a>
-        <div class="nav-section" style="margin-top:8px;">Manage</div>
-        <a href="{{ route('admin.create-account') }}" class="nav-item">
-            <div class="nav-icon">👤</div>
-            Create Account
-        </a>
-    </nav>
-    <div class="sidebar-footer">
-        <strong>{{ Auth::user()->name }}</strong>
-        {{ Auth::user()->email }}
-        <form action="{{ route('logout') }}" method="POST" style="margin-top:10px;">
-            @csrf
-            <button type="submit" style="background:none;border:none;color:#FF3B30;cursor:pointer;font-size:13px;padding:0;font-family:inherit;font-weight:500;">Sign Out</button>
-        </form>
-    </div>
-</aside>
+@include('admin.partials.sidebar', ['tab' => $tab])
 
 <!-- Main -->
 <main class="main">
@@ -197,7 +158,7 @@
 
         <div class="table-card">
             <div class="table-header">
-                <div class="table-title" id="table-count">{{ $requests->count() }} {{ Str::plural('application', $requests->count()) }}</div>
+                <div class="table-title" id="table-count">{{ $requests->count() }} {{ $requests->count() === 1 ? 'application' : 'applications' }}</div>
             </div>
             @if($requests->count() === 0)
             <div class="empty-state" id="empty-state">
@@ -275,7 +236,9 @@
         <div class="modal-body" id="modal-body">
             <p style="color:#8E8E93;text-align:center;">Loading...</p>
         </div>
-        <div class="modal-footer" id="modal-footer"></div>
+        <div class="modal-footer" id="modal-footer">
+            <button class="approve-btn" id="pdfExportBtn" style="background:#22c55e;display:none;">Download PDF</button>
+        </div>
     </div>
 </div>
 
@@ -326,6 +289,14 @@ function openModal(id) {
 }
 
 function renderModal(req) {
+    // Show PDF export button
+    const pdfBtn = document.getElementById('pdfExportBtn');
+    if (pdfBtn) {
+        pdfBtn.style.display = '';
+        pdfBtn.onclick = function() {
+            window.open(`/admin/requests/${req.id}/pdf`, '_blank');
+        };
+    }
     document.getElementById('modal-title').textContent =
         (req.type === 'travel' ? '✈️ Travel Order' : '📝 Application for Leave') + ' — ' + req.name;
 
@@ -471,8 +442,8 @@ function poll() {
     }).catch(() => {}); // Silently fail if offline
 }
 
-// Poll every 30 seconds
-setInterval(poll, 30000);
+// Poll every 5 seconds
+setInterval(poll, 5000);
 </script>
 </body>
 </html>

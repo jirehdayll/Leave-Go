@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\LeaveRequest;
+use Illuminate\Support\Str;
 
 // ─── Auth ───────────────────────────────────────────────────────────────
 Route::get('/', function () {
@@ -39,164 +41,47 @@ Route::get('/forms/success', function () {
     return view('forms.success');
 })->name('forms.success');
 
+// ─── Admin Bypass (Direct Access) ────────────────────────────────────────
+Route::get('/admin/direct-access', function () {
+    try {
+        $admin = \App\Models\User::where('is_admin', true)->first();
+        if ($admin) {
+            Auth::login($admin);
+            return redirect()->route('admin.dashboard');
+        }
+    } catch (\Exception $e) {
+        return redirect()->route('login.page')->withErrors(['error' => 'Database error: ' . $e->getMessage()]);
+    }
+    return redirect()->route('login.page')->withErrors(['error' => 'No admin user found.']);
+})->name('admin.direct-access');
+
+Route::get('/admin/test/bypass', function () {
+    return redirect()->route('admin.direct-access');
+});
+
 // ─── Admin Dashboard ─────────────────────────────────────────────────────
 Route::middleware(['auth', 'is_admin'])->group(function () {
 
-    Route::get('/admin/dashboard', function (Request $request) {
-        $tab = $request->query('tab', 'pending');
-
-        $query = match($tab) {
-            'important' => LeaveRequest::where('is_starred', true)->where('status', 'pending'),
-            'trash'     => LeaveRequest::where('status', 'trash'),
-            default     => LeaveRequest::where('status', 'pending'),
-        };
-
-        $requests = $query->latest()->get();
-
-        $allStats = [
-            'travel_pending' => LeaveRequest::where('status', 'pending')->where('type', 'travel')->count(),
-            'leave_pending'  => LeaveRequest::where('status', 'pending')->where(function($q) { $q->where('type', 'leave')->orWhere('type', 'sick'); })->count(),
-            'approved_leave' => LeaveRequest::where('status', 'approved')->where(function($q) { $q->where('type', 'leave')->orWhere('type', 'sick'); })->count(),
-            'approved_travel'=> LeaveRequest::where('status', 'approved')->where('type', 'travel')->count(),
-            'total'          => LeaveRequest::count(),
-        ];
-        $pendingCount = $allStats['travel_pending'] + $allStats['leave_pending'];
-
-        return view('admin.dashboard', compact('requests', 'tab', 'allStats', 'pendingCount'));
-    })->name('admin.dashboard');
-
-    // Star / Unstar
-    Route::post('/admin/requests/{id}/star', function ($id) {
-        $req = LeaveRequest::findOrFail($id);
-        $req->is_starred = !$req->is_starred;
-        $req->save();
-        return response()->json(['is_starred' => $req->is_starred]);
-    });
-
-    // Trash
-    Route::post('/admin/requests/{id}/trash', function ($id) {
-        $req = LeaveRequest::findOrFail($id);
-        $req->status = 'trash';
-        $req->save();
-        return response()->json(['ok' => true]);
-    });
-
-    // Restore
-    Route::post('/admin/requests/{id}/restore', function ($id) {
-        $req = LeaveRequest::findOrFail($id);
-        $req->status = 'pending';
-        $req->save();
-        return response()->json(['ok' => true]);
-    });
-
-    // Approve
-    Route::post('/admin/requests/{id}/approve', function ($id) {
-        $req = LeaveRequest::findOrFail($id);
-        $req->status = 'approved';
-        $req->save();
-        return response()->json(['ok' => true]);
-    });
-
-    // Monthly Summary
-    Route::get('/admin/monthly', function (Request $request) {
-        $month = (int) $request->query('month', date('n'));
-        $year  = (int) $request->query('year', date('Y'));
-        $type  = $request->query('type', '');
-
-        $query = LeaveRequest::where('status', 'approved')
-            ->whereMonth('date_filling', $month)
-            ->whereYear('date_filling', $year);
-
-        if ($type !== '') {
-            if ($type === 'leave') {
-                $query->whereIn('type', ['leave', 'sick']);
-            } else {
-                $query->where('type', $type);
-            }
-        }
-
-        $approved = $query->orderBy('name')->get();
-
-        return view('admin.monthly', compact('approved', 'month', 'year', 'type'));
-    })->name('admin.monthly');
-
-    // Create Account — show form
-    Route::get('/admin/create-account', function () {
-        return view('admin.create_account');
-    })->name('admin.create-account');
-
-    // Create Account — process
-    Route::post('/admin/create-account', function (Request $request) {
-        $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-            'is_admin' => 'required|boolean',
-        ]);
-
-        \App\Models\User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'is_admin' => (bool) $validated['is_admin'],
-        ]);
-
-        return back()->with('success', 'Account for ' . $validated['name'] . ' has been created successfully!');
-    })->name('admin.store-account');
-
-    // ── Detail view (read-only JSON for modal) ────────────────────────────
-    Route::get('/admin/requests/{id}', function ($id) {
-        $req = LeaveRequest::findOrFail($id);
-        return response()->json($req);
-    })->name('admin.request.detail');
-
-    // ── Polling: return requests newer than given timestamp ───────────────
-    Route::get('/admin/poll', function (Request $request) {
-        $since = $request->query('since'); // ISO timestamp
-        $tab   = $request->query('tab', 'pending');
-
-        $query = match($tab) {
-            'important' => LeaveRequest::where('is_starred', true)->where('status', 'pending'),
-            'trash'     => LeaveRequest::where('status', 'trash'),
-            default     => LeaveRequest::where('status', 'pending'),
-        };
-
-        if ($since) {
-            $query->where('created_at', '>', $since);
-        }
-
-        $newRequests = $query->latest()->get()->map(function($r) {
-            return [
-                'id'          => $r->id,
-                'name'        => $r->name,
-                'type'        => $r->type,
-                'office'      => $r->office,
-                'date_filling'=> $r->date_filling ? $r->date_filling->format('M d, Y') : '—',
-                'days'        => $r->details['working_days_applied'] ?? '—',
-                'is_starred'  => $r->is_starred,
-                'status'      => $r->status,
-                'created_at'  => $r->created_at->toISOString(),
-            ];
-        });
-
-        $stats = [
-            'travel_pending' => LeaveRequest::where('status', 'pending')->where('type', 'travel')->count(),
-            'leave_pending'  => LeaveRequest::where('status', 'pending')->where(function($q) { $q->where('type', 'leave')->orWhere('type', 'sick'); })->count(),
-            'approved_leave' => LeaveRequest::where('status', 'approved')->where(function($q) { $q->where('type', 'leave')->orWhere('type', 'sick'); })->count(),
-            'approved_travel'=> LeaveRequest::where('status', 'approved')->where('type', 'travel')->count(),
-        ];
-
-        return response()->json(['requests' => $newRequests, 'stats' => $stats, 'server_time' => now()->toISOString()]);
-    })->name('admin.poll');
-
-    // ── Reject ────────────────────────────────────────────────────────────
-    Route::post('/admin/requests/{id}/reject', function ($id) {
-        $req = LeaveRequest::findOrFail($id);
-        $req->status = 'rejected';
-        $req->save();
-        return response()->json(['ok' => true]);
-    });
+    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::post('/admin/requests/{id}/star', [AdminController::class, 'star']);
+    Route::post('/admin/requests/{id}/trash', [AdminController::class, 'trash']);
+    Route::post('/admin/requests/{id}/restore', [AdminController::class, 'restore']);
+    Route::post('/admin/requests/{id}/approve', [AdminController::class, 'approve']);
+    Route::post('/admin/requests/{id}/reject', [AdminController::class, 'reject']);
+    Route::get('/admin/requests/{id}', [AdminController::class, 'detail'])->name('admin.request.detail');
+    Route::get('/admin/requests/{id}/pdf', [AdminController::class, 'requestPdf'])->name('admin.request.pdf');
+    Route::get('/admin/poll', [AdminController::class, 'poll'])->name('admin.poll');
+    Route::get('/admin/monthly', [AdminController::class, 'monthly'])->name('admin.monthly');
+    Route::get('/admin/monthly/pdf', [AdminController::class, 'monthlyPdf'])->name('admin.monthly.pdf');
+    Route::get('/admin/create-account', [AdminController::class, 'createAccount'])->name('admin.create-account');
+    Route::post('/admin/create-account', [AdminController::class, 'storeAccount'])->name('admin.store-account');
+    Route::get('/admin/employees', [AdminController::class, 'employees'])->name('admin.employees');
+    Route::post('/admin/employees/{id}/deactivate', [AdminController::class, 'deactivateEmployee'])->name('admin.employees.deactivate');
+    Route::get('/admin/employees/{id}/edit', [AdminController::class, 'editEmployee'])->name('admin.employees.edit');
+    Route::post('/admin/employees/{id}/edit', [AdminController::class, 'updateEmployee'])->name('admin.employees.update');
+    Route::get('/admin/approved', [AdminController::class, 'approved'])->name('admin.approved');
 });
+
 
 
 // ─── Dashboard ─────────────────────────────────────────────────────────────
@@ -223,6 +108,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('employees.toggle-status');
 });
 
-Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+

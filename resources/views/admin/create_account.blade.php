@@ -25,72 +25,52 @@
         .main { margin-left:260px; flex:1; min-height:100vh; }
         .topbar { background:#fff; border-bottom:1px solid #E5E5EA; padding:16px 28px; display:flex; align-items:center; }
         .topbar-title { font-size:20px; font-weight:600; color:#1C1C1E; }
-        .content { padding:40px 28px; }
-        .form-container { max-width:520px; }
+        .content { padding:40px 48px; display: flex; justify-content: center; }
+        .form-container { width:100%; max-width:1000px; }
 
-        .form-title { font-size:28px; font-weight:700; color:#1C1C1E; margin-bottom:6px; letter-spacing:-0.5px; }
-        .form-subtitle { font-size:15px; color:#8E8E93; margin-bottom:28px; }
+        .form-header { margin-bottom: 32px; }
+        .form-title { font-size:32px; font-weight:700; color:#1C1C1E; margin-bottom:8px; letter-spacing:-0.5px; }
+        .form-subtitle { font-size:16px; color:#8E8E93; }
 
-        .ios-card { background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.06); overflow:hidden; margin-bottom:20px; }
-        .ios-card-header { padding:14px 18px; border-bottom:1px solid #F2F2F7; font-size:12px; font-weight:600; color:#8E8E93; text-transform:uppercase; letter-spacing:0.6px; }
-        .ios-row { display:flex; align-items:center; padding:14px 18px; border-bottom:1px solid #F2F2F7; }
+        .ios-card { background:#fff; border-radius:20px; box-shadow:0 4px 24px rgba(0,0,0,0.04); overflow:hidden; margin-bottom:24px; border: 1px solid #E5E5EA; }
+        .ios-card-header { padding:18px 24px; border-bottom:1px solid #F2F2F7; font-size:13px; font-weight:600; color:#8E8E93; text-transform:uppercase; letter-spacing:0.8px; background: #FAFAFA; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; }
+        .ios-row { display:flex; flex-direction: column; padding:18px 24px; border-bottom:1px solid #F2F2F7; border-right: 1px solid #F2F2F7; }
+        .ios-row.full-width { grid-column: span 2; border-right: none; }
+        .ios-row:nth-child(even) { border-right: none; }
         .ios-row:last-child { border-bottom:none; }
-        .ios-row label { font-size:15px; color:#1C1C1E; min-width:130px; flex-shrink:0; }
-        .ios-row input, .ios-row select { flex:1; border:none; outline:none; font-size:15px; color:#1C1C1E; text-align:right; font-family:inherit; background:transparent; min-width:0; }
+        
+        .ios-row label { font-size:13px; font-weight: 600; color:#8E8E93; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .ios-row input, .ios-row select { width: 100%; border:none; outline:none; font-size:17px; color:#1C1C1E; font-family:inherit; background:transparent; }
         .ios-row input::placeholder { color:#C7C7CC; }
+        .ios-row select { appearance: none; cursor: pointer; }
 
-        .submit-btn { width:100%; background:#007AFF; color:#fff; font-size:17px; font-weight:600; padding:16px; border:none; border-radius:14px; cursor:pointer; font-family:inherit; box-shadow:0 4px 16px rgba(0,122,255,0.3); transition:background 0.2s; }
-        .submit-btn:hover { background:#005CC5; }
+        .submit-btn { width:auto; min-width: 200px; background:#007AFF; color:#fff; font-size:17px; font-weight:600; padding:16px 32px; border:none; border-radius:16px; cursor:pointer; font-family:inherit; box-shadow:0 8px 20px rgba(0,122,255,0.25); transition: all 0.2s ease; display: block; margin-left: auto; }
+        .submit-btn:hover { background:#005CC5; transform: translateY(-1px); box-shadow:0 10px 24px rgba(0,122,255,0.3); }
+        .submit-btn:active { transform: translateY(0); }
 
-        .alert-success { background:#E8FBF0; color:#1A7A3E; border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:14px; font-weight:500; }
-        .alert-error { background:#FFF0F0; color:#CC0000; border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:14px; }
+        .alert-success { background:#E8FBF0; color:#1A7A3E; border-radius:14px; padding:16px 20px; margin-bottom:28px; font-size:15px; font-weight:500; border: 1px solid rgba(26,122,62,0.1); }
+        .alert-error { background:#FFF0F0; color:#CC0000; border-radius:14px; padding:16px 20px; margin-bottom:28px; font-size:15px; border: 1px solid rgba(204,0,0,0.1); }
+        
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .ios-row { grid-column: span 1; border-right: none; }
+            .content { padding: 24px; }
+        }
     </style>
 </head>
 <body>
 
-<aside class="sidebar">
-    <div class="sidebar-header">
-        <div class="sidebar-logo">LeaveGo</div>
-        <div class="sidebar-subtitle">Admin Panel</div>
-    </div>
-    <nav class="sidebar-nav">
-        <div class="nav-section-title">Applications</div>
-        <a href="{{ route('admin.dashboard', ['tab'=>'pending']) }}" class="nav-item">
-            <div class="nav-icon">📥</div> Pending
-        </a>
-        <a href="{{ route('admin.dashboard', ['tab'=>'important']) }}" class="nav-item">
-            <div class="nav-icon">⭐</div> Important
-        </a>
-        <a href="{{ route('admin.dashboard', ['tab'=>'trash']) }}" class="nav-item">
-            <div class="nav-icon">🗑</div> Trash
-        </a>
-        <div class="nav-section-title" style="margin-top:8px;">Reports</div>
-        <a href="{{ route('admin.monthly') }}" class="nav-item">
-            <div class="nav-icon">📊</div> Monthly Summary
-        </a>
-        <div class="nav-section-title" style="margin-top:8px;">Manage</div>
-        <a href="{{ route('admin.create-account') }}" class="nav-item active">
-            <div class="nav-icon">👤</div> Create Account
-        </a>
-    </nav>
-    <div class="sidebar-footer">
-        <strong>{{ Auth::user()->name }}</strong>
-        {{ Auth::user()->email }}
-        <form action="{{ route('logout') }}" method="POST" style="margin-top:10px;">
-            @csrf
-            <button type="submit" style="background:none;border:none;color:#FF3B30;cursor:pointer;font-size:13px;padding:0;font-family:inherit;font-weight:500;">Sign Out</button>
-        </form>
-    </div>
-</aside>
+@include('admin.partials.sidebar')
 
 <main class="main">
-    <div class="topbar">
-        <div class="topbar-title">👤 Create Account</div>
-    </div>
     <div class="content">
         <div class="form-container">
-            <h1 class="form-title">New Account</h1>
-            <p class="form-subtitle">Create a login for a new employee.</p>
+            <div class="form-header">
+                <h1 class="form-title">Create New Account</h1>
+                <p class="form-subtitle">Register a new team member and grant system access.</p>
+            </div>
 
             @if(session('success'))
             <div class="alert-success">✅ {{ session('success') }}</div>
@@ -107,32 +87,34 @@
             <form action="{{ route('admin.store-account') }}" method="POST">
                 @csrf
                 <div class="ios-card">
-                    <div class="ios-card-header">Account Details</div>
-                    <div class="ios-row">
-                        <label>Full Name</label>
-                        <input type="text" name="name" required placeholder="John Doe" value="{{ old('name') }}">
-                    </div>
-                    <div class="ios-row">
-                        <label>Email Address</label>
-                        <input type="email" name="email" required placeholder="john@cenro.gov.ph" value="{{ old('email') }}">
-                    </div>
-                    <div class="ios-row">
-                        <label>Password</label>
-                        <input type="password" name="password" required placeholder="Min. 8 characters">
-                    </div>
-                    <div class="ios-row">
-                        <label>Confirm Password</label>
-                        <input type="password" name="password_confirmation" required placeholder="Repeat password">
-                    </div>
-                    <div class="ios-row">
-                        <label>Role</label>
-                        <select name="is_admin">
-                            <option value="0">Employee</option>
-                            <option value="1">Admin</option>
-                        </select>
+                    <div class="ios-card-header">Account Information</div>
+                    <div class="form-grid">
+                        <div class="ios-row full-width">
+                            <label>Full Name</label>
+                            <input type="text" name="name" required placeholder="John Doe" value="{{ old('name') }}">
+                        </div>
+                        <div class="ios-row full-width">
+                            <label>Email Address</label>
+                            <input type="email" name="email" required placeholder="john@cenro.gov.ph" value="{{ old('email') }}">
+                        </div>
+                        <div class="ios-row">
+                            <label>Password</label>
+                            <input type="password" name="password" required placeholder="Min. 8 characters">
+                        </div>
+                        <div class="ios-row">
+                            <label>Confirm Password</label>
+                            <input type="password" name="password_confirmation" required placeholder="Repeat password">
+                        </div>
+                        <div class="ios-row full-width">
+                            <label>Account Role</label>
+                            <select name="is_admin">
+                                <option value="0" {{ old('is_admin') == '0' ? 'selected' : '' }}>Employee (Standard Access)</option>
+                                <option value="1" {{ old('is_admin') == '1' ? 'selected' : '' }}>Administrator (Elevated Privileges)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">Create Account</button>
+                <button type="submit" class="submit-btn">Register Account</button>
             </form>
         </div>
     </div>

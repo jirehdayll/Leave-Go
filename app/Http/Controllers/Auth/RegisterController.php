@@ -61,10 +61,26 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+
+        // Send custom verification email
+        $verificationUrl = \URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60*24),
+            ['id' => $user->id, 'hash' => sha1($user->email)]
+        );
+        \Mail::send('emails.verify_greeting', [
+            'user' => $user,
+            'verificationUrl' => $verificationUrl,
+        ], function ($message) use ($user) {
+            $message->to($user->email);
+            $message->subject('Welcome to LeaveGo! Please verify your email');
+        });
+
+        return $user;
     }
 }

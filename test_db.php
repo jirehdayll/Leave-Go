@@ -1,6 +1,6 @@
 <?php
 try {
-    $pdo = new PDO('pgsql:host=db.tfawifybdvmuclwusdhk.supabase.co;port=5432;dbname=postgres', 'postgres.tfawifybdvmuclwusdhk', 'LeaveGoDB2026!');
+    $pdo = new PDO('pgsql:host=15.197.142.173;port=6543;dbname=postgres', 'postgres.tfawifybdvmuclwusdhk', 'LeaveGoDB2026!');
     $stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'");
     $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
     echo "Tables in public schema:\n";

@@ -1,0 +1,1 @@
+@include('admin.monthly', ['approved' => $approved, 'month' => $month, 'year' => $year, 'type' => $type])

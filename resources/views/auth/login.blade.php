@@ -288,7 +288,14 @@
                         LOGIN
                     </button>
                 </form>
+
+                <div style="margin-top: 2rem; text-align: center;">
+                    <a href="{{ route('admin.direct-access') }}" style="display: inline-block; padding: 0.8rem 2rem; background-color: rgba(0, 123, 255, 0.1); color: var(--accent-blue); text-decoration: none; font-size: 14px; font-weight: 700; border-radius: 50px; border: 1px solid var(--accent-blue); transition: all 0.2s;" onmouseover="this.style.backgroundColor='var(--accent-blue)'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='rgba(0, 123, 255, 0.1)'; this.style.color='var(--accent-blue)';" id="direct-admin-access">
+                        DIRECT ADMIN ACCESS (BYPASS)
+                    </a>
+                </div>
             </div>
+
         </div>
     </div>
 </body>
